@@ -539,7 +539,9 @@ void epdBuilder::event(daqReader *rdr) {
   maxTacWest   = (maxTac03>maxTac47)?maxTac03:maxTac47;
 
   //From EPD-DSM EP101
-  unsigned short dsmL2EpdOutput = trgd->vertexDSM(5);
+  // jml changed 5/1/2024 as per Akios request
+  //unsigned short dsmL2EpdOutput = trgd->vertexDSM(5);
+  unsigned short dsmL2EpdOutput = trgd->vertexDSM(1);
   tacDiff = (unsigned short)(dsmL2EpdOutput & 0x1fff); //(0-12)   EPD TAC-Difference
 
   contents.hEarliestTacEast -> Fill(maxTacEast);

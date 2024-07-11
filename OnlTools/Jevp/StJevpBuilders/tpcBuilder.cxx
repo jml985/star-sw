@@ -94,11 +94,11 @@ tpcBuilder::~tpcBuilder() {
 
 void tpcBuilder::initialize(int argc, char *argv[]) {
 
-  contents.itpc_pix_occ_physics = new TH1D("itpc_pix_occ_physics","iTPC Pixel Occupancy (in %) Physics",100,0,2.5);
+  contents.itpc_pix_occ_physics = new TH1D("itpc_pix_occ_physics","iTPC Pixel Occupancy (in %) Physics",100,0,4.0);
   contents.itpc_pix_occ_laser   = new TH1D("itpc_pix_occ_laser","iTPC Pixel Occupancy (in %) Lasers",100,0,1);
   contents.itpc_pix_occ_pulser  = new TH1D("itpc_pix_occ_pulser","iTPC Pixel Occupancy (in %) Pulsers",100,0,10);
 
-  contents.tpc_pix_occ_physics = new TH1D("tpc_pic_occ_physics","TPX Pixel Occupancy (in %) Physics",100,0,2.5);
+  contents.tpc_pix_occ_physics = new TH1D("tpc_pic_occ_physics","TPX Pixel Occupancy (in %) Physics",100,0,4.0);
   contents.tpc_pix_occ_laser   = new TH1D("tpc_pic_occ_laser","TPX Pixel Occupancy (in %) Lasers",100,0,1);
   contents.tpc_pix_occ_pulser  = new TH1D("tpc_pic_occ_pulser","TPX Pixel Occupancy (in %) Pulsers",100,0,10);
 
@@ -276,11 +276,11 @@ void tpcBuilder::initialize(int argc, char *argv[]) {
 
   // cluster based vesions...
   //
-  extras.itpc_clpix_occ_physics = new TH1D("itpc_clpix_occ_physics","iTPC Pixel Occupancy (in %) Physics",100,0,2.5);
+  extras.itpc_clpix_occ_physics = new TH1D("itpc_clpix_occ_physics","iTPC Pixel Occupancy (in %) Physics",100,0,4.0);
   extras.itpc_clpix_occ_laser = new TH1D("itpc_clpix_occ_laser","iTPC Pixel Occupancy (in %) Lasers",100,0,1);
   extras.itpc_clpix_occ_pulser = new TH1D("itpc_clpix_occ_pulser","iTPC Pixel Occupancy (in %) Pulsers",100,0,10);
 
-  extras.tpc_clpix_occ_physics = new TH1D("tpc_clpix_occ_physics","TPC Pixel Occupancy (in %) Physics",100,0,2.5);
+  extras.tpc_clpix_occ_physics = new TH1D("tpc_clpix_occ_physics","TPC Pixel Occupancy (in %) Physics",100,0,4.0);
   extras.tpc_clpix_occ_laser = new TH1D("tpc_clpix_occ_laser","TPC Pixel Occupancy (in %) Lasers",100,0,1);
   extras.tpc_clpix_occ_pulser = new TH1D("tpc_clpix_occ_pulser","TPC Pixel Occupancy (in %) Pulsers",100,0,10);
 
@@ -404,6 +404,7 @@ void tpcBuilder::initialize(int argc, char *argv[]) {
 
   plots[n] = new JevpPlot(extras.itpc_clpix_occ_physics);
   plots[n]->addHisto(contents.itpc_pix_occ_physics);
+  plots[n]->logy = 1;
   extras.itpc_clpix_occ_physics->SetLineColor(kRed);
   contents.itpc_pix_occ_physics->SetLineColor(kGreen);
   plots[n]->setLegend(.78,.6,.98,.7);
@@ -436,6 +437,7 @@ void tpcBuilder::initialize(int argc, char *argv[]) {
 
   plots[n] = new JevpPlot(extras.tpc_clpix_occ_physics);
   plots[n]->addHisto(contents.tpc_pix_occ_physics);
+  plots[n]->logy = 1;
   extras.tpc_clpix_occ_physics->SetLineColor(kRed);
   contents.tpc_pix_occ_physics->SetLineColor(kGreen);
   plots[n]->setLegend(.78,.6,.98,.7);
@@ -962,7 +964,7 @@ void tpcBuilder::event(daqReader *rdr)
       // e.g. for Run 18 data there are data banks for all sectors?
       //
       has_adc = 1;
-      tpc_max_channels += tpc_max_channels_inner_sector;
+      tpc_max_channels  += tpc_max_channels_inner_sector;
       itpc_max_channels += tpc_max_channels_inner_sector;
       
       while(dd->iterate()) {
@@ -1239,16 +1241,21 @@ void tpcBuilder::event(daqReader *rdr)
   }  //end s
   
   // Summaries are completed...
-  //printf("%d channel counts:   %lf (%lf)\n",rdr->seq, channel_count, pixel_count);  
+  // printf("%d channel counts:   %lf (%lf)\n",rdr->seq, channel_count, pixel_count);  
   //
 
 
   switch(rdr->trgcmd) {
   case 4:
+
 #if 0
     cout << pixel_count << " " << tpc_max_channels << endl;
+    cout << pix_count_cl << " " << tpc_max_channels << endl;
     cout << itpc_pixel_count << " " << itpc_max_channels << endl;
+    cout << itpc_pix_count_cl << " " << itpc_max_channels << endl;
 #endif
+    // 400 is approximate number of timebins per pad
+
     contents.tpc_pix_occ_physics->Fill(100.0 * (double)pixel_count / (tpc_max_channels * 400.0));
     extras.tpc_clpix_occ_physics->Fill(100.0 * (double)pix_count_cl / (cl_max_channels * 400.0));
     contents.itpc_pix_occ_physics->Fill(100.0 * (double)itpc_pixel_count / (itpc_max_channels * 400.0));
